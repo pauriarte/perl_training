@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use v5.14;
+#use v5.14;
 use Scalar::Util 'looks_like_number';
 
 my ($a, $b, $c) = @ARGV;
