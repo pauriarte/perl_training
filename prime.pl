@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use v5.14;
+use v5.18;
 say "Insert integer number n from diapason 2..1000000:";
 my $number = <STDIN>;
 
