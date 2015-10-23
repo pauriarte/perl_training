@@ -21,9 +21,8 @@ do {
 
 } until !defined($line) || $line eq "\n";
 
-my $lotr = join "|", keys %replace;
-$lotr = qr/$lotr/;
+my $exp = join "|", keys %replace;
 
-$text =~ s/($lotr)/$replace{$1}/cg;
+$text =~ s/($exp)/$replace{$1}/cg;
 
 say $text;
