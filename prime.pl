@@ -8,14 +8,14 @@ if ($number >= 2 && $number <= 1000000 && $number =~ /\d+/){
 	my @tmp;
 	my $it = 0;
 	while($it < $number){
-		@tmp[$it] = 1;
+		$tmp[$it] = 1;
 		$it++;
 	}
 
 	my $root = sqrt($number);
 
 	LABEL:for(my $i = 2; $i <= $root; $i++){
-		next LABEL if(@tmp[$i]!= 1); 
+		next LABEL if($tmp[$i]!= 1); 
 		for( my $j = $i*$i; $j < $number; $j+=$i){
 			if($tmp[$j] == 1){
 				$tmp[$j] = 0;		
@@ -24,15 +24,15 @@ if ($number >= 2 && $number <= 1000000 && $number =~ /\d+/){
 	}
 
 	my $j = 0;
-	my @primos;
+	my @primes;
 
 	for(my $i = 1; $i < $number; $i++){
 		if($tmp[$i] == 1){
-			@primos[$j++] = $i." ";
+			@primes[$j++] = $i." ";
 		}
 	}
 
-	say @primos;
+	say @primes;
 }
 else{
 	die ("Bad input\n");
