@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use v5.18;
+use v5.14;
 use Data::Dumper;
 
 #-------------------Class Coordinate--------------------------
@@ -65,22 +65,71 @@ sub set_color{
 
 1;
 
-#-------------------Class Figure--------------------------
+#-------------------Class Rectangle--------------------------
 package Rectangle;
 use Data::Dumper;
 
 our @ISA = qw( Figure );
 
 sub new {
-	my $class = shift;
+	#my $class = shift;
+	#my ($color, $coord) = @_;
+	#print Dumper /$coord;
+	#my $this = $class->SUPER::new($color, $coord);
+
+	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
 	my ($color, $coord) = @_;
-	$this = $class->SUPER::new($color, $coord);
+	#print Dumper \$coord;
+	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
+	my $self=$class->Figure::new($color,$coord); #Inicializamos las propiedades con las usadas en Coche
+	#$self->{PRECIO} = undef; #No se indica ningun precio
+	bless $self, $class; #Se crea la clase
+	return ($self); #Devolvemos la clase recién construida
 }
 
 sub calculateArea(){
-	@coord = @{shift->{'coord'};
-	print Dumper \@coord;
-	return $this;
+	my @coord = @{shift->{'coord'}};
+	my ($x1,$x2,$x3,$x4,$y1,$y2,$y3,$y4) = ($coord[0]->get_x,$coord[1]->get_x,$coord[2]->get_x,$coord[3]->get_x,$coord[0]->get_y,$coord[1]->get_y,$coord[2]->get_y,$coord[3]->get_y);
+	my $dist1 = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
+	my $dist2 = sqrt (($x4-$x3)**2 + ($y4-$y3)**2);
+	say $dist1;
+	say $dist2;
+	return $dist1 * $dist2;
+}
+
+
+1;
+
+#-------------------Class Square--------------------------
+package Square;
+use Data::Dumper;
+
+our @ISA = qw( Rectangle );
+
+sub new {
+	#my $class = shift;
+	#my ($color, $coord) = @_;
+	#print Dumper /$coord;
+	#my $this = $class->SUPER::new($color, $coord);
+
+	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
+	my ($color, $coord) = @_;
+	#print Dumper \$coord;
+	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
+	my $self=$class->Figure::new($color,$coord); #Inicializamos las propiedades con las usadas en Coche
+	#$self->{PRECIO} = undef; #No se indica ningun precio
+	bless $self, $class; #Se crea la clase
+	return ($self); #Devolvemos la clase recién construida
+}
+
+sub calculateArea(){
+	my @coord = @{shift->{'coord'}};
+	my ($x1,$x2,$x3,$x4,$y1,$y2,$y3,$y4) = ($coord[0]->get_x,$coord[1]->get_x,$coord[2]->get_x,$coord[3]->get_x,$coord[0]->get_y,$coord[1]->get_y,$coord[2]->get_y,$coord[3]->get_y);
+	my $dist1 = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
+	my $dist2 = sqrt (($x4-$x3)**2 + ($y4-$y3)**2);
+	say $dist1;
+	say $dist2;
+	return $dist1 * $dist2;
 }
 
 
@@ -92,18 +141,18 @@ package main;
 
 use Data::Dumper qw(Dumper);
 
-my $c1 = Coordinate->new(56,3);
-my $c2 = Coordinate->new(20,30);
-my $c3 = Coordinate->new(34,34);
-my $c4 = Coordinate->new(56,3);
+my $c1 = Coordinate->new(1,3);
+my $c2 = Coordinate->new(1,8);
+my $c3 = Coordinate->new(6,3);
+my $c4 = Coordinate->new(6,8);
 
 
 
-my @coordinates = ($c1, $c2, $c3, $c4);
+my $coordinates = [$c1, $c2, $c3, $c4];
 #print Dumper \@coordinates;
 
-#my $f = Figure->new('blue', \@coordinates);
-my $r = Rectangle->new('blue', \@coordinates);
+#my $f = Figure->new('blue', $coordinates);
+my $r = Rectangle->new('blue', $coordinates);
 #$c1->set_x(333);
 #say $c1->get_x;
 #say $c1->get_y;
@@ -112,7 +161,10 @@ my $r = Rectangle->new('blue', \@coordinates);
 #my @cor = $f->get_coord;
 #print Dumper \$cor[1]->get_x;
 #print Dumper \$cor[1]->get_y;
-$r->calculateArea();
+my $area = $r->calculateArea();
+$r->set_color("orange");
+say $r->get_color;
+say $area;
 
 
 
