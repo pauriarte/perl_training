@@ -128,6 +128,8 @@ sub calculateArea(){
 
 #-------------------Class Circle--------------------------
 package Circle;
+
+use Math::Trig;
 use Data::Dumper;
 
 our @ISA = qw( Figure );
@@ -146,8 +148,8 @@ sub calculateArea(){
 	my @coord = @{shift->{'coord'}};
 	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[1]->get_x,$coord[0]->get_y,$coord[1]->get_y);
 	my $dist = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
-	say $dist;
-	return $dist**2;
+	say "Pi: ".pi;
+	return pi*$dist**2;
 }
 
 
@@ -172,6 +174,7 @@ my $coordinates = [$c1, $c2, $c3, $c4];
 #my $f = Figure->new('blue', $coordinates);
 my $r = Rectangle->new('blue', $coordinates);
 my $s = Square->new('red', $coordinates);
+my $c = Circle->new('yellow', $coordinates);
 #$c1->set_x(333);
 #say $c1->get_x;
 #say $c1->get_y;
@@ -187,6 +190,10 @@ say $area;
 
 $area = $s->calculateArea();
 say $s->get_color;
+say $area;
+
+$area = $c->calculateArea();
+say $c->get_color;
 say $area;
 
 
