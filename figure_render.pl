@@ -279,7 +279,7 @@ sub createFigure {
     my $figure;
     my $name = $this->{'figure'};    
     my $coord = $this->{'coord'};
-    if($name =~ /Rectangle|Square|Circle|Triangle/){
+    if($name =~ /Rectangle|Square|Circle|Triangle|rectangle|square|circle|triangle/){
         $figure = $name->new($coord);
     }
     else
@@ -304,6 +304,8 @@ my $controller = Controller->new();
 
 my @figures;
 
+say "1-Example: create Rectangle|Square|Circle|Triangle x1,y1 x2,y2 x3,y3 x4,y4";
+say "2-To continue enter new figure press enter and repeat step 1. To finish insert figure, press enter with empty line.";
 do{
     $line = <STDIN>;
     #say $line;
@@ -336,70 +338,5 @@ for my $fig (@figures){
     $fig->draw;
 }
 
-
-#my $c1 = Coordinate->new(1,3);
-#my $c2 = Coordinate->new(1,8);
-#my $c3 = Coordinate->new(6,3);
-#my $c4 = Coordinate->new(6,8);
-
-
-
-#my $coordinates = [$c1, $c2, $c3, $c4];
-
-#my $controller = Controller->new();
-
-#my $figure = $controller->createFigure("Rectangle",$coordinates);
-
-
-#my $area = $figure->calculateArea();
-#say $figure->get_color;
-#say $area;
-
-#$figure = $controller->createFigure("Square",$coordinates);
-
-
-#$area = $figure->calculateArea();
-#say $figure->get_color;
-#say $area;
-
-#$figure = $controller->createFigure("Circle",$coordinates);
-
-
-#$area = $figure->calculateArea();
-#say $figure->get_color;
-#say $area;
-
-#$figure = $controller->createFigure("Triangle",$coordinates);
-
-
-#$area = $figure->calculateArea();
-#say $figure->get_color;
-#say $area;
-
-
-#print Dumper \@coordinates;
-
-#my $f = Figure->new('blue', $coordinates);
-#my $r = Rectangle->new('blue', $coordinates);
-#my $s = Square->new('red', $coordinates);
-#my $c = Circle->new('yellow', $coordinates);
-#my $t = Triangle->new('green', $coordinates);
-
-#my $area = $r->calculateArea();
-#$r->set_color("orange");
-#say $r->get_color;
-#say $area;
-
-#$area = $s->calculateArea();
-#say $s->get_color;
-#say $area;
-
-#$area = $c->calculateArea();
-#say $c->get_color;
-#say $area;
-
-#$area = $t->calculateArea();
-#say $t->get_color;
-#say $area;
 
 1;
