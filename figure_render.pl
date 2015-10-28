@@ -124,12 +124,10 @@ sub new {
 
 sub calculateArea(){
 	my @coord = @{shift->{'coord'}};
-	my ($x1,$x2,$x3,$x4,$y1,$y2,$y3,$y4) = ($coord[0]->get_x,$coord[1]->get_x,$coord[2]->get_x,$coord[3]->get_x,$coord[0]->get_y,$coord[1]->get_y,$coord[2]->get_y,$coord[3]->get_y);
-	my $dist1 = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
-	my $dist2 = sqrt (($x4-$x3)**2 + ($y4-$y3)**2);
-	say $dist1;
-	say $dist2;
-	return $dist1 * $dist2;
+	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[1]->get_x,$coord[0]->get_y,$coord[1]->get_y);
+	my $dist = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
+	say $dist;
+	return $dist**2;
 }
 
 
@@ -153,6 +151,7 @@ my $coordinates = [$c1, $c2, $c3, $c4];
 
 #my $f = Figure->new('blue', $coordinates);
 my $r = Rectangle->new('blue', $coordinates);
+my $s = Square->new('red', $coordinates);
 #$c1->set_x(333);
 #say $c1->get_x;
 #say $c1->get_y;
@@ -164,6 +163,10 @@ my $r = Rectangle->new('blue', $coordinates);
 my $area = $r->calculateArea();
 $r->set_color("orange");
 say $r->get_color;
+say $area;
+
+$area = $s->calculateArea();
+say $s->get_color;
 say $area;
 
 
