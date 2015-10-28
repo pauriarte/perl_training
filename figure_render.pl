@@ -2,6 +2,9 @@
 use v5.18;
 use Data::Dumper;
 use GD::Simple;
+use DBI;
+
+
 #-------------------Class Coordinate--------------------------
 package Coordinate;
 
@@ -41,7 +44,7 @@ use Data::Dumper;
 
 sub new {
 	my $class = shift;
-	my ($coord) = @_;
+	my ($coord,$dbh) = @_;
 
 	#print	Dumper \$coord;
 
@@ -49,6 +52,7 @@ sub new {
 
 	$this->{'color'} = undef;
 	$this->{'coord'} = $coord;
+	$this->{'dbh'} = $dbh;
 	return $this;
 }
 
@@ -75,17 +79,14 @@ use GD::Simple;
 our @ISA = qw( Figure );
 
 sub new {
-	#my $class = shift;
-	#my ($color, $coord) = @_;
-	#print Dumper /$coord;
-	#my $this = $class->SUPER::new($color, $coord);
-
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord) = @_;
+	my ($coord,$dbh) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Figure
-    $self->{'color'} = "red";
+	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Figure
+    	$self->{'color'} = "red";
+	
+	my @coord = @{$self->{'coord'}};
 
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
@@ -126,11 +127,11 @@ our @ISA = qw( Rectangle );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord) = @_;
+	my ($coord,$dbh) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Rectangle
-    $self->{'color'} = "blue";
+	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Rectangle
+    	$self->{'color'} = "blue";
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
 }
@@ -169,11 +170,11 @@ our @ISA = qw( Figure );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord) = @_;
+	my ($coord,$dbh) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Figure
-    $self->{'color'} = "green";
+	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Figure
+    	$self->{'color'} = "green";
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
 }
@@ -212,10 +213,10 @@ our @ISA = qw( Figure );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord) = @_;
+	my ($coord,$dbh) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Figure
+	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Figure
     $self->{'color'} = "yellow";
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
@@ -261,13 +262,15 @@ sub draw(){
 #-------------------Class Controller--------------------------
 
 package Controller;
-use Data::Dumper;
 
 sub new {
 	my $class = shift;
     
 	my $this = bless {}, $class;
-
+	my $dbh = DBI->connect('DBI:mysql:Render', 'pauriarte', 'r00t'
+	           ) || die "Could not connect to database: $DBI::errstr";
+	
+	$this->{'dbh'}= $dbh;
 	return $this;
 }
 
@@ -280,7 +283,7 @@ sub createFigure {
     my $name = $this->{'figure'};    
     my $coord = $this->{'coord'};
     if($name =~ /Rectangle|Square|Circle|Triangle|rectangle|square|circle|triangle/){
-        $figure = $name->new($coord);
+        $figure = $name->new($coord, $this->{'dbh'});
     }
     else
     {
@@ -333,7 +336,7 @@ do{
 } until !defined($line) || $line eq "\n";
 
 for my $fig (@figures){
-    say $fig->get_color;
+   # say $fig->get_color;
     say $fig->calculateArea;
     $fig->draw;
 }
