@@ -81,8 +81,7 @@ sub new {
 	my ($color, $coord) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->Figure::new($color,$coord); #Inicializamos las propiedades con las usadas en Coche
-	#$self->{PRECIO} = undef; #No se indica ningun precio
+	my $self=$class->SUPER::new($color,$coord); #Inicializamos las propiedades con las usadas en Figure
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
 }
@@ -107,17 +106,38 @@ use Data::Dumper;
 our @ISA = qw( Rectangle );
 
 sub new {
-	#my $class = shift;
-	#my ($color, $coord) = @_;
-	#print Dumper /$coord;
-	#my $this = $class->SUPER::new($color, $coord);
-
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
 	my ($color, $coord) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->Figure::new($color,$coord); #Inicializamos las propiedades con las usadas en Coche
-	#$self->{PRECIO} = undef; #No se indica ningun precio
+	my $self=$class->SUPER::new($color,$coord); #Inicializamos las propiedades con las usadas en Rectangle
+	bless $self, $class; #Se crea la clase
+	return ($self); #Devolvemos la clase recién construida
+}
+
+sub calculateArea(){
+	my @coord = @{shift->{'coord'}};
+	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[1]->get_x,$coord[0]->get_y,$coord[1]->get_y);
+	my $dist = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
+	say $dist;
+	return $dist**2;
+}
+
+
+1;
+
+#-------------------Class Circle--------------------------
+package Circle;
+use Data::Dumper;
+
+our @ISA = qw( Figure );
+
+sub new {
+	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
+	my ($color, $coord) = @_;
+	#print Dumper \$coord;
+	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
+	my $self=$class->SUPER::new($color,$coord); #Inicializamos las propiedades con las usadas en Figure
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
 }
