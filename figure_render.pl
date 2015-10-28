@@ -96,6 +96,10 @@ sub calculateArea(){
 	return $dist1 * $dist2;
 }
 
+sub validate_coord(){
+
+}
+
 
 1;
 
@@ -155,6 +159,34 @@ sub calculateArea(){
 
 1;
 
+#-------------------Class Triangle--------------------------
+package Triangle;
+
+use Data::Dumper;
+
+our @ISA = qw( Figure );
+
+sub new {
+	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
+	my ($color, $coord) = @_;
+	#print Dumper \$coord;
+	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
+	my $self=$class->SUPER::new($color,$coord); #Inicializamos las propiedades con las usadas en Figure
+	bless $self, $class; #Se crea la clase
+	return ($self); #Devolvemos la clase recién construida
+}
+
+sub calculateArea(){
+	my @coord = @{shift->{'coord'}};
+	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[1]->get_x,$coord[0]->get_y,$coord[1]->get_y);
+	my $dist = sqrt (($x2-$x1)**2 + ($y2-$y1)**2);
+	say $dist;
+	return (sqrt(3)/4)*$dist**2;
+}
+
+
+1;
+
 
 #-------------------Class main--------------------------
 package main;
@@ -175,6 +207,7 @@ my $coordinates = [$c1, $c2, $c3, $c4];
 my $r = Rectangle->new('blue', $coordinates);
 my $s = Square->new('red', $coordinates);
 my $c = Circle->new('yellow', $coordinates);
+my $t = Triangle->new('green', $coordinates);
 #$c1->set_x(333);
 #say $c1->get_x;
 #say $c1->get_y;
@@ -194,6 +227,10 @@ say $area;
 
 $area = $c->calculateArea();
 say $c->get_color;
+say $area;
+
+$area = $t->calculateArea();
+say $t->get_color;
 say $area;
 
 
