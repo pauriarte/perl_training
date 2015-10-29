@@ -1,9 +1,7 @@
 #!/usr/bin/perl
-use v5.14;
+use v5.18;
 use Data::Dumper;
 use GD::Simple;
-use DBI;
-
 
 #-------------------Class Coordinate--------------------------
 package Coordinate;
@@ -38,7 +36,7 @@ sub set_y {
 
 sub get_coord_str {
 	my $this = shift;
-	my $coord_str.=$this->{x}.",".$this->{x};
+	my $coord_str.=$this->{x}.",".$this->{y};
 	
 	return $coord_str;
 }
@@ -267,6 +265,9 @@ sub draw(){
 
 package Controller;
 
+use DBI;
+use Data::Dumper;
+
 sub new {
 	my $class = shift;
     
@@ -275,7 +276,7 @@ sub new {
 	           ) || die "Could not connect to database: $DBI::errstr";
 	
 	$this->{'dbh'}= $dbh;
-	$this->{'id'}=1;
+#	$this->{'id'}=1;
 	
 	$dbh->do('CREATE TABLE IF NOT EXISTS Figures (id INT, name VARCHAR(50),type VARCHAR(100),coordinates VARCHAR(100))');
 	
@@ -284,6 +285,11 @@ sub new {
 	
 	my $select = $dbh->prepare(q{SELECT name, coordinates FROM Figures WHERE type = ?}) or die $dbh->errstr;
 	$this->{'select'}= $select;
+
+	my $select_id = $dbh->prepare(q{SELECT id FROM Figures WHERE type = ? ORDER BY id DESC }) or die $dbh->errstr;
+	$this->{'select_id'}= $select_id;
+
+
 	return $this;
 }
 
@@ -294,17 +300,22 @@ sub createFigure {
         
     my $figure;  
     my $insert = $this->{'insert'};
-    my $id=$this->{'id'};
+	my $select_id = $this->{'select_id'};
+    my $dbh = $this->{'dbh'};
     
-    if($name =~ /Rectangle|Square|Circle|Triangle|rectangle|square|circle|triangle/){
+    if($name =~ /Rectangle|Square|Circle|Triangle/){
         
         $figure = $name->new($coord);
         
         my $coordinates;
-        for my $val ($coord){
-	  $coordinates.=$val->get_coord_str." ";
+        for my $val (@{$coord}){
+
+            $coordinates.=$val->get_coord_str." ";
         }
-       
+        say "Lista de coordenadas: $coordinates";
+        $select_id->execute($name) or die $dbh->errstr;
+        my $id = $select_id->fetchrow_array()+1;
+        #say $id;
         $insert->execute($id, $name."_".$id, $name, $coordinates) or die $dbh->errstr;
     }
     else
@@ -319,10 +330,11 @@ sub listFigure{
   my $this = shift;
   my $name = shift;
   my $select = $this->{'select'};
- 
+  my $dbh = $this->{'dbh'};
+
   $select->execute($name) or die $dbh->errstr;
   
-  while ( @row = $select->fetchrow_array ) {
+  while (my @row = $select->fetchrow_array ) {
     print "@row\n";
   }
 }
