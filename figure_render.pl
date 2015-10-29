@@ -118,7 +118,7 @@ sub draw(){
 	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[2]->get_x,$coord[0]->get_y,$coord[2]->get_y);
 
     $img->rectangle($x1,$y1,$x2,$y2);
-    open my $out, '>', 'rectangle_img.png' or die;
+    open my $out, '>', $this->{'name'}.'_img.png' or die;
     binmode $out;
     print $out $img->png;
 }
@@ -160,7 +160,7 @@ sub draw(){
 	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[2]->get_x,$coord[0]->get_y,$coord[2]->get_y);
 
     $img->rectangle($x1,$y1,$x2,$y2);
-    open my $out, '>', 'square_img.png' or die;
+    open my $out, '>', $this->{'name'}.'_img.png' or die;
     binmode $out;
     print $out $img->png;
 }
@@ -204,7 +204,7 @@ sub draw(){
 	my ($x1,$x2,$y1,$y2) = ($coord[0]->get_x,$coord[1]->get_x,$coord[0]->get_y,$coord[1]->get_y);
    	my $dist = sqrt (($x2-$x1)**2 + ($y2-$y1)**2); 
     $img->filledArc($x1,$y1,$dist,$dist,0,360,$img->colorAllocate(46,139,87));
-    open my $out, '>', 'circle_img.png' or die;
+    open my $out, '>', $this->{'name'}.'_img.png' or die;
     binmode $out;
     print $out $img->png;
 }
@@ -257,7 +257,7 @@ sub draw(){
     $poly->addPt($x2,$y2);
     $poly->addPt($x3,$y3);
     $img->polygon($poly);
-    open my $out, '>', 'triangle_img.png' or die;
+    open my $out, '>', $this->{'name'}.'_img.png' or die;
     binmode $out;
     print $out $img->png;
 }
