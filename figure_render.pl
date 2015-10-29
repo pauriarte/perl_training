@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use v5.18;
+use v5.14;
 use Data::Dumper;
 use GD::Simple;
 use DBI;
@@ -23,7 +23,7 @@ sub get_x {
 }
 
 sub set_x {
-	   my $this = shift;
+	my $this = shift;
 	   $this->{x} = shift || 0;
 }
 
@@ -32,8 +32,15 @@ sub get_y {
 }
 
 sub set_y {
-	   my $this = shift;
+	my $this = shift;
 	   $this->{y} = shift || 0;
+}
+
+sub get_coord_str {
+	my $this = shift;
+	my $coord_str.=$this->{x}.",".$this->{x};
+	
+	return $coord_str;
 }
 
 1;
@@ -44,7 +51,7 @@ use Data::Dumper;
 
 sub new {
 	my $class = shift;
-	my ($coord,$dbh) = @_;
+	my ($coord) = @_;
 
 	#print	Dumper \$coord;
 
@@ -52,7 +59,6 @@ sub new {
 
 	$this->{'color'} = undef;
 	$this->{'coord'} = $coord;
-	$this->{'dbh'} = $dbh;
 	return $this;
 }
 
@@ -80,13 +86,11 @@ our @ISA = qw( Figure );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord,$dbh) = @_;
+	my ($coord) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Figure
+	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Figure
     	$self->{'color'} = "red";
-	
-	my @coord = @{$self->{'coord'}};
 
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
@@ -127,10 +131,10 @@ our @ISA = qw( Rectangle );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord,$dbh) = @_;
+	my ($coord) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Rectangle
+	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Rectangle
     	$self->{'color'} = "blue";
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
@@ -170,10 +174,10 @@ our @ISA = qw( Figure );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord,$dbh) = @_;
+	my ($coord) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Figure
+	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Figure
     	$self->{'color'} = "green";
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
@@ -213,10 +217,10 @@ our @ISA = qw( Figure );
 
 sub new {
 	my $this=shift; #Cogemos la clase que somos o una referencia a la clase (si soy un objeto)
-	my ($coord,$dbh) = @_;
+	my ($coord) = @_;
 	#print Dumper \$coord;
 	my $class = ref($this) || $this; #Averiguo la clase a la que pertenezco
-	my $self=$class->SUPER::new($coord,$dbh); #Inicializamos las propiedades con las usadas en Figure
+	my $self=$class->SUPER::new($coord); #Inicializamos las propiedades con las usadas en Figure
     $self->{'color'} = "yellow";
 	bless $self, $class; #Se crea la clase
 	return ($self); #Devolvemos la clase recién construida
@@ -271,26 +275,56 @@ sub new {
 	           ) || die "Could not connect to database: $DBI::errstr";
 	
 	$this->{'dbh'}= $dbh;
+	$this->{'id'}=1;
+	
+	$dbh->do('CREATE TABLE IF NOT EXISTS Figures (id INT, name VARCHAR(50),type VARCHAR(100),coordinates VARCHAR(100))');
+	
+	my $insert = $dbh->prepare(q{INSERT INTO Figures (id, name, type,coordinates) VALUES (?, ?, ?, ?)}) or die $dbh->errstr;
+	$this->{'insert'}= $insert;
+	
+	my $select = $dbh->prepare(q{SELECT name, coordinates FROM Figures WHERE type = ?}) or die $dbh->errstr;
+	$this->{'select'}= $select;
 	return $this;
 }
 
 sub createFigure {
     my $this = shift;
- 	$this->{'figure'} = shift;
-	$this->{'coord'} = shift;
+    my $name = shift;
+    my $coord = shift;
         
-    my $figure;
-    my $name = $this->{'figure'};    
-    my $coord = $this->{'coord'};
+    my $figure;  
+    my $insert = $this->{'insert'};
+    my $id=$this->{'id'};
+    
     if($name =~ /Rectangle|Square|Circle|Triangle|rectangle|square|circle|triangle/){
-        $figure = $name->new($coord, $this->{'dbh'});
+        
+        $figure = $name->new($coord);
+        
+        my $coordinates;
+        for my $val ($coord){
+	  $coordinates.=$val->get_coord_str." ";
+        }
+       
+        $insert->execute($id, $name."_".$id, $name, $coordinates) or die $dbh->errstr;
     }
     else
     {
         default {die "No figure named $name."};
     }
 
-   	return $figure;
+    return $figure;
+}
+
+sub listFigure{
+  my $this = shift;
+  my $name = shift;
+  my $select = $this->{'select'};
+ 
+  $select->execute($name) or die $dbh->errstr;
+  
+  while ( @row = $select->fetchrow_array ) {
+    print "@row\n";
+  }
 }
 
 
@@ -317,21 +351,22 @@ do{
     my $command = shift @parameters;
     my $name = shift @parameters;
     
-    ##say "Name: $name";
-     my ($x,$y);
-     my @array_coord;
-     for my $point (@parameters){
+    if($command =~/create/){
+	my ($x,$y);
+	my @array_coord;
+	for my $point (@parameters){
         ($x,$y)=split(",",$point);
         #say "x: $x y:$y";
         my $coord = Coordinate->new($x,$y);
         push @array_coord, $coord;
-    }
-   # print Dumper \@array_coord;
-    if($command =~/create/){
+	}
+    
         my $figure = $controller->createFigure($name,\@array_coord);
         push @figures,$figure;
     }
-   
+    elsif($command =~/list/){
+	$controller->listFigure($name);
+    }
 
 } until !defined($line) || $line eq "\n";
 
